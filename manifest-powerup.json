@@ -1,0 +1,22 @@
+{
+  "name": "Inspección y Cotización - Taller",
+  "details": "Sistema completo de inspección de vehículos y generación de cotizaciones para talleres mecánicos",
+  "icon": {
+    "url": "https://cdn-icons-png.flaticon.com/512/3176/3176366.png"
+  },
+  "author": "Sistema de Taller",
+  "capabilities": [
+    "card-buttons",
+    "card-badges",
+    "card-back-section",
+    "show-settings"
+  ],
+  "connectorName": "Inspección Taller",
+  "tags": [
+    "taller",
+    "inspección",
+    "cotización",
+    "vehículos",
+    "mantenimiento"
+  ]
+}

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspección y Cotización - Taller</title>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f4f5f7;
+            padding: 15px;
+            font-size: 13px;
+        }
+
+        .compact-container {
+            max-width: 100%;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .compact-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .compact-header h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .info-section {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .compact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #333;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            padding: 8px;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 1px #667eea;
+        }
+
+        .checklist-section {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .category-compact {
+            margin-bottom: 15px;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+        }
+
+        .category-header-compact {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-header-compact:hover {
+            background: #5568d3;
+        }
+
+        .category-content-compact {
+            background: white;
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+
+        .category-content-compact.collapsed {
+            max-height: 0;
+        }
+
+        .checklist-item-compact {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 8px;
+        }
+
+        .checklist-item-compact:last-child {
+            border-bottom: none;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .status-btn {
+            padding: 4px 10px;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .status-btn.active-ok {
+            background: #61bd4f;
+            color: white;
+            border-color: #61bd4f;
+        }
+
+        .status-btn.active-mal {
+            background: #eb5a46;
+            color: white;
+            border-color: #eb5a46;
+        }
+
+        .cotizar-check {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+        }
+
+        .cotizar-check input {
+            cursor: pointer;
+        }
+
+        .cotizacion-compact {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 2px solid #667eea;
+        }
+
+        .cotizacion-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .cotizacion-item-compact {
+            display: grid;
+            grid-template-columns: 2fr 0.5fr 0.8fr 0.8fr auto;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .cotizacion-input-compact {
+            padding: 6px;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .add-btn-compact {
+            background: #61bd4f;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .add-btn-compact:hover {
+            background: #5aac44;
+        }
+
+        .remove-btn-compact {
+            background: #eb5a46;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .totales-compact {
+            background: white;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .total-row-compact {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .total-row-compact:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            color: #667eea;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 2px solid #667eea;
+        }
+
+        .actions-compact {
+            padding: 15px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            background: white;
+        }
+
+        .btn-compact {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-compact {
+            background: #0079bf;
+            color: white;
+        }
+
+        .btn-primary-compact:hover {
+            background: #026aa7;
+        }
+
+        .btn-success-compact {
+            background: #61bd4f;
+            color: white;
+        }
+
+        .btn-success-compact:hover {
+            background: #5aac44;
+        }
+
+        .notification-compact {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #61bd4f;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            font-size: 13px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+            font-size: 10px;
+        }
+
+        .collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="compact-container">
+        <div class="compact-header">
+            <h2>🔧 Inspección y Cotización</h2>
+            <p style="font-size: 11px; opacity: 0.9;">Sistema de Taller</p>
+        </div>
+
+        <div class="info-section">
+            <div class="compact-grid">
+                <div class="input-group">
+                    <label>Cliente</label>
+                    <input type="text" id="cliente" placeholder="Nombre del cliente">
+                </div>
+                <div class="input-group">
+                    <label>Orden de Servicio</label>
+                    <input type="text" id="orden" placeholder="N° de orden">
+                </div>
+                <div class="input-group">
+                    <label>Económico</label>
+                    <input type="text" id="economico" placeholder="N° económico">
+                </div>
+                <div class="input-group">
+                    <label>VIN</label>
+                    <input type="text" id="vin" placeholder="VIN">
+                </div>
+                <div class="input-group">
+                    <label>Kilometraje</label>
+                    <input type="text" id="kilometraje" placeholder="KM">
+                </div>
+                <div class="input-group">
+                    <label>Fecha</label>
+                    <input type="date" id="fecha">
+                </div>
+            </div>
+        </div>
+
+        <div class="checklist-section">
+            <div id="checklistContainer"></div>
+        </div>
+
+        <div class="cotizacion-compact">
+            <div class="cotizacion-title">💰 Cotización</div>
+            <div id="cotizacionContainer">
+                <div class="cotizacion-item-compact" style="font-weight: 600; font-size: 11px;">
+                    <div>Concepto</div>
+                    <div>Cant.</div>
+                    <div>Precio</div>
+                    <div>Total</div>
+                    <div></div>
+                </div>
+            </div>
+            <button class="add-btn-compact" onclick="agregarItemCotizacion()">
+                ➕ Agregar Item
+            </button>
+
+            <div class="totales-compact">
+                <div class="total-row-compact">
+                    <span>Subtotal M.O.:</span>
+                    <span id="subtotalMO">$0.00</span>
+                </div>
+                <div class="total-row-compact">
+                    <span>Subtotal Ref.:</span>
+                    <span id="subtotalRef">$0.00</span>
+                </div>
+                <div class="total-row-compact">
+                    <span>IVA (16%):</span>
+                    <span id="iva">$0.00</span>
+                </div>
+                <div class="total-row-compact">
+                    <span>TOTAL:</span>
+                    <span id="totalGeneral">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-compact">
+            <button class="btn-compact btn-success-compact" onclick="guardarEnTarjeta()">
+                💾 Guardar en Tarjeta
+            </button>
+        </div>
+    </div>
+
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+        // Datos del checklist
+        const checklistData = {
+            'INTERIOR DE LA CABINA': [
+                'Revise el juego libre del pedal de embrague',
+                'Revise los limpiadores y aspersores del parabrisas',
+                'Revise funcionamiento del claxon',
+                'Revise las luces Interiores, los direccionales y luces de tablero',
+                'Revise que no haya fugas de aire en el interior de la cabina',
+                'Conecte el switch y verifique si tiene códigos de falla',
+                'Revise funcionamiento de indicadores del tablero',
+                'Revise indicador de restrictor de filtro de aire'
+            ],
+            'MOTOR': [
+                'Revise nivel de aceite de la dirección',
+                'Revise nivel de aceite del motor',
+                'Revise nivel de anticongelante',
+                'Revise concentración de propileno en anticongelante',
+                'Revise estado de radiador y soportes',
+                'Revise estado de bandas y poleas de motor',
+                'Revise estado de mangueras',
+                'Revise tuberías del sistema de admisión de aire',
+                'Revise nivel de fluído del cilindro maestro de clutch',
+                'Revise fugas de aceite en motor',
+                'Revise soportes de motor y transmisión'
+            ],
+            'DIRECCIÓN Y SUSPENSIÓN': [
+                'Revise la barra de dirección, crucetas de la barra, montaje de la caja de dirección',
+                'Revise fugas de aceite en la caja de dirección',
+                'Revise estado de muelles y amortiguadores',
+                'Revise fugas de aire en la suspensión',
+                'Revise estado de los terminales de la barra de dirección',
+                'Revise altura de la suspención',
+                'Levante eje delantero e inspeccione juego en pasador de espiga'
+            ],
+            'TRANSMISIÓN Y DIFERENCIAL': [
+                'Revise nivel de aceite de la transmisión',
+                'Revise estado de crucetas de barra cardan',
+                'Revise estado de yugo de transmisión y diferencial',
+                'Revise nivel de aceite de diferencial',
+                'Revise estado de toma de fuerza y mangueras',
+                'Revise fugas de aceite en transmisión',
+                'Revise fugas de aceite en diferencial'
+            ],
+            'FRENOS': [
+                'Revise fugas en tanques de aire',
+                'Revise fugas de aire en rotocámaras',
+                'Revise estado de balatas y patrón de desgaste',
+                'Revise funcionamiento de los ajustadores de frenos',
+                'Revise si el sistema ABS tiene códigos activos'
+            ],
+            'INSPECCIÓN DEL VEHÍCULO': [
+                'Revise las luces - faros, stop, direccionales y reverseros',
+                'Revise los seguros del cofre',
+                'Revise estado de las abrazaderas de tanques de combustible',
+                'Revise estado de las baterías (prueba con midtronics)',
+                'Revise estado del tubo de escape y sistema AFT',
+                'Revise estado de espejos',
+                'Revise mangueras, conectores de aire y conector eléctrico',
+                'Revise sistema de suspensión de aire de la cabina',
+                'Revise estado de quinta rueda, muelas y montaje'
+            ],
+            'POSTRATAMIENTO': [
+                'Revise nivel de urea',
+                'Revise concentración de urea',
+                'Revise códigos activos de sistema de postratamiento'
+            ]
+        };
+
+        let t = window.TrelloPowerUp.iframe();
+        let cotizacionCounter = 0;
+
+        // Inicializar
+        window.onload = function() {
+            inicializarChecklist();
+            cargarDatosExistentes();
+            document.getElementById('fecha').valueAsDate = new Date();
+        };
+
+        function inicializarChecklist() {
+            const container = document.getElementById('checklistContainer');
+            
+            Object.keys(checklistData).forEach((categoria, catIndex) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-compact';
+                categoryDiv.innerHTML = `
+                    <div class="category-header-compact" onclick="toggleCategory(${catIndex})">
+                        <span>${categoria}</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content-compact">
+                        ${checklistData[categoria].map((item, itemIndex) => `
+                            <div class="checklist-item-compact" data-category="${categoria}" data-index="${itemIndex}">
+                                <div class="item-text">${item}</div>
+                                <div class="status-buttons">
+                                    <button class="status-btn" onclick="setStatus(this, '${categoria}', ${itemIndex}, 'ok')">OK</button>
+                                    <button class="status-btn" onclick="setStatus(this, '${categoria}', ${itemIndex}, 'mal')">MAL</button>
+                                </div>
+                                <div class="cotizar-check">
+                                    <input type="checkbox" id="cot_${catIndex}_${itemIndex}" 
+                                           onchange="toggleCotizar('${item}', this.checked)">
+                                    <label for="cot_${catIndex}_${itemIndex}">Cotizar</label>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function toggleCategory(index) {
+            const categories = document.querySelectorAll('.category-compact');
+            const content = categories[index].querySelector('.category-content-compact');
+            content.classList.toggle('collapsed');
+        }
+
+        function setStatus(button, categoria, index, status) {
+            const item = button.closest('.checklist-item-compact');
+            const buttons = item.querySelectorAll('.status-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('active-ok', 'active-mal');
+            });
+            
+            if (status === 'ok') {
+                button.classList.add('active-ok');
+            } else {
+                button.classList.add('active-mal');
+            }
+            
+            // Guardar estado
+            item.dataset.status = status;
+        }
+
+        function toggleCotizar(concepto, agregar) {
+            if (agregar) {
+                agregarItemCotizacion(concepto);
+            }
+        }
+
+        function agregarItemCotizacion(conceptoPredefinido = '') {
+            cotizacionCounter++;
+            const container = document.getElementById('cotizacionContainer');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'cotizacion-item-compact';
+            itemDiv.id = `cot_item_${cotizacionCounter}`;
+            itemDiv.innerHTML = `
+                <input type="text" class="cotizacion-input-compact concepto" 
+                       placeholder="Concepto" value="${conceptoPredefinido}">
+                <input type="number" class="cotizacion-input-compact cantidad" 
+                       placeholder="1" value="1" onchange="calcularTotales()">
+                <input type="number" class="cotizacion-input-compact precio" 
+                       placeholder="0.00" step="0.01" onchange="calcularTotales()">
+                <span class="total-item">$0.00</span>
+                <button class="remove-btn-compact" onclick="eliminarItem(${cotizacionCounter})">✕</button>
+            `;
+            container.appendChild(itemDiv);
+        }
+
+        function eliminarItem(id) {
+            const item = document.getElementById(`cot_item_${id}`);
+            if (item) {
+                item.remove();
+                calcularTotales();
+            }
+        }
+
+        function calcularTotales() {
+            let subtotalMO = 0;
+            let subtotalRef = 0;
+
+            const items = document.querySelectorAll('.cotizacion-item-compact:not(:first-child)');
+            items.forEach(item => {
+                const cantidad = parseFloat(item.querySelector('.cantidad')?.value || 0);
+                const precio = parseFloat(item.querySelector('.precio')?.value || 0);
+                const total = cantidad * precio;
+                
+                const totalSpan = item.querySelector('.total-item');
+                if (totalSpan) {
+                    totalSpan.textContent = `$${total.toFixed(2)}`;
+                }
+
+                subtotalMO += total;
+            });
+
+            const iva = (subtotalMO + subtotalRef) * 0.16;
+            const totalGeneral = subtotalMO + subtotalRef + iva;
+
+            document.getElementById('subtotalMO').textContent = `$${subtotalMO.toFixed(2)}`;
+            document.getElementById('subtotalRef').textContent = `$${subtotalRef.toFixed(2)}`;
+            document.getElementById('iva').textContent = `$${iva.toFixed(2)}`;
+            document.getElementById('totalGeneral').textContent = `$${totalGeneral.toFixed(2)}`;
+        }
+
+        function cargarDatosExistentes() {
+            t.card('name').then(function(card) {
+                // Intentar cargar datos guardados previamente
+                t.get('card', 'shared', 'inspeccionData').then(function(data) {
+                    if (data) {
+                        // Restaurar datos
+                        console.log('Datos cargados:', data);
+                    }
+                });
+            });
+        }
+
+        async function guardarEnTarjeta() {
+            try {
+                // Recopilar datos
+                const datos = {
+                    cliente: document.getElementById('cliente').value,
+                    orden: document.getElementById('orden').value,
+                    economico: document.getElementById('economico').value,
+                    vin: document.getElementById('vin').value,
+                    kilometraje: document.getElementById('kilometraje').value,
+                    fecha: document.getElementById('fecha').value,
+                    checklist: {},
+                    cotizacion: [],
+                    totales: {
+                        subtotalMO: document.getElementById('subtotalMO').textContent,
+                        subtotalRef: document.getElementById('subtotalRef').textContent,
+                        iva: document.getElementById('iva').textContent,
+                        total: document.getElementById('totalGeneral').textContent
+                    }
+                };
+
+                // Recopilar checklist
+                const items = document.querySelectorAll('.checklist-item-compact');
+                items.forEach(item => {
+                    const categoria = item.dataset.category;
+                    if (!datos.checklist[categoria]) {
+                        datos.checklist[categoria] = [];
+                    }
+                    datos.checklist[categoria].push({
+                        item: item.querySelector('.item-text').textContent,
+                        estado: item.dataset.status || 'No revisado'
+                    });
+                });
+
+                // Recopilar cotización
+                const cotItems = document.querySelectorAll('.cotizacion-item-compact:not(:first-child)');
+                cotItems.forEach(item => {
+                    const concepto = item.querySelector('.concepto')?.value || '';
+                    if (concepto) {
+                        datos.cotizacion.push({
+                            concepto: concepto,
+                            cantidad: item.querySelector('.cantidad')?.value || '1',
+                            precio: item.querySelector('.precio')?.value || '0',
+                            total: item.querySelector('.total-item')?.textContent || '$0.00'
+                        });
+                    }
+                });
+
+                // Generar descripción formateada
+                const descripcion = formatearDescripcion(datos);
+
+                // Actualizar tarjeta
+                await t.card('name', 'desc')
+                    .then(function(card) {
+                        return t.set('card', 'shared', 'inspeccionData', datos);
+                    })
+                    .then(function() {
+                        // Actualizar descripción
+                        return t.updateCard({desc: descripcion});
+                    })
+                    .then(function() {
+                        mostrarNotificacion('✅ Datos guardados en la tarjeta');
+                        setTimeout(() => {
+                            t.closePopup();
+                        }, 1500);
+                    });
+
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                mostrarNotificacion('❌ Error al guardar: ' + error.message);
+            }
+        }
+
+        function formatearDescripcion(datos) {
+            let desc = `## 📋 INFORMACIÓN DEL VEHÍCULO\n\n`;
+            desc += `**Cliente:** ${datos.cliente}\n`;
+            desc += `**Orden:** ${datos.orden} | **Económico:** ${datos.economico}\n`;
+            desc += `**VIN:** ${datos.vin} | **KM:** ${datos.kilometraje}\n`;
+            desc += `**Fecha:** ${datos.fecha}\n\n`;
+            
+            desc += `---\n\n`;
+            desc += `## 🔍 INSPECCIÓN\n\n`;
+            
+            let totalOK = 0;
+            let totalMAL = 0;
+            let itemsMAL = [];
+            
+            Object.keys(datos.checklist).forEach(categoria => {
+                datos.checklist[categoria].forEach(item => {
+                    if (item.estado === 'ok') totalOK++;
+                    if (item.estado === 'mal') {
+                        totalMAL++;
+                        itemsMAL.push({categoria, item: item.item});
+                    }
+                });
+            });
+            
+            desc += `✅ **Items OK:** ${totalOK} | ❌ **Problemas:** ${totalMAL}\n\n`;
+            
+            if (itemsMAL.length > 0) {
+                desc += `### ⚠️ ITEMS QUE REQUIEREN ATENCIÓN:\n\n`;
+                let currentCat = '';
+                itemsMAL.forEach(({categoria, item}) => {
+                    if (categoria !== currentCat) {
+                        desc += `\n**${categoria}:**\n`;
+                        currentCat = categoria;
+                    }
+                    desc += `- ❌ ${item}\n`;
+                });
+            }
+            
+            desc += `\n---\n\n`;
+            desc += `## 💰 COTIZACIÓN\n\n`;
+            
+            if (datos.cotizacion.length > 0) {
+                datos.cotizacion.forEach((item, index) => {
+                    desc += `${index + 1}. **${item.concepto}**\n`;
+                    desc += `   Cantidad: ${item.cantidad} | Precio: $${item.precio} | Total: ${item.total}\n`;
+                });
+            }
+            
+            desc += `\n### 📊 TOTALES:\n`;
+            desc += `- Subtotal M.O.: ${datos.totales.subtotalMO}\n`;
+            desc += `- Subtotal Ref.: ${datos.totales.subtotalRef}\n`;
+            desc += `- IVA: ${datos.totales.iva}\n`;
+            desc += `- **TOTAL: ${datos.totales.total}**\n`;
+            
+            return desc;
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notification = document.createElement('div');
+            notification.className = 'notification-compact';
+            notification.textContent = mensaje;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
